@@ -14,7 +14,12 @@ def detect_sections(text):
 
     phone_found = bool(
         re.search(
-            r"(\+?\d{1,3}[- ]?)?(\d{10})",
+            r"\+\d{1,3}\s?\(?\d{1,4}\)?[-.\s]?\d{3}[-.\s]?\d{4}"
+            r"|\(\d{3}\)\s?\d{3}[-.\s]?\d{4}"
+            r"|\d{5}\s\d{3}\s\d{3}"
+            r"|\d{4}\s\d{3}\s\d{3}"
+            r"|\d{3}[-.\s]\d{3}[-.\s]\d{4}"
+            r"|\d{10}",
             text
         )
     )
@@ -32,52 +37,78 @@ def detect_sections(text):
     )
 
     sections = {
+
         "Career Objective": [
             "objective",
             "career objective",
+            "career summary",
             "professional summary",
-            "summary"
+            "summary",
+            "profile"
         ],
+
         "Education": [
             "education",
             "academic",
             "qualification",
             "degree"
         ],
+
         "Skills": [
             "skills",
             "technical skills",
-            "key skills"
+            "key skills",
+            "core competencies"
         ],
+
         "Projects": [
             "projects",
-            "project"
+            "project",
+            "personal projects",
+            "academic projects"
         ],
+
         "Experience": [
             "experience",
             "work experience",
+            "employment",
+            "employment history",
+            "professional experience",
+            "work history",
             "internship",
-            "employment"
+            "internships",
+            "volunteer experience"
         ],
+
         "Certifications": [
             "certifications",
             "certification",
-            "certificate"
+            "certificate",
+            "licenses"
         ],
+
         "Achievements": [
             "achievements",
             "achievement",
             "awards",
-            "award"
+            "award",
+            "honors",
+            "publications",
+            "leadership"
         ],
+
         "Languages": [
             "languages",
             "language"
         ],
+
         "Interests": [
             "interests",
-            "hobbies"
+            "hobbies",
+            "extracurricular",
+            "activities"
         ]
+
     }
 
     present_count = 1 if detected_sections["Contact Information"] else 0
