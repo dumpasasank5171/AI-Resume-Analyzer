@@ -8,26 +8,21 @@ def extract_email(text):
         text
     )
 
-    if match:
-        return match.group()
-
-    return "Not Found"
+    return match.group() if match else "Not Found"
 
 
 def extract_phone(text):
 
     patterns = [
-        r"\+\d{1,3}\s?\d{10}",
-        r"\d{10}",
-        r"\(\d{3}\)\s?\d{3}-\d{4}",
+        r"\+\d{1,3}\s?\(?\d{1,4}\)?[-.\s]?\d{3}[-.\s]?\d{4}",
+        r"\(\d{3}\)\s?\d{3}[-.\s]?\d{4}",
         r"\d{3}[-.\s]\d{3}[-.\s]\d{4}",
-        r"\+\d{1,3}[-\s]?\(\d{3}\)\s?\d{3}[-.\s]?\d{4}"
+        r"\+91[-\s]?\d{10}",
+        r"\d{10}"
     ]
 
     for pattern in patterns:
-
         match = re.search(pattern, text)
-
         if match:
             return match.group().strip()
 
@@ -37,7 +32,7 @@ def extract_phone(text):
 def extract_linkedin(text):
 
     match = re.search(
-        r"(https?://)?(www\.)?linkedin\.com/[A-Za-z0-9_/\-]+",
+        r"(https?://)?(www\.)?linkedin\.com/[^\s|]+",
         text,
         re.IGNORECASE
     )
@@ -45,16 +40,13 @@ def extract_linkedin(text):
     if match:
         return match.group()
 
-    if "linkedin" in text.lower():
-        return "LinkedIn Mentioned"
-
-    return "Not Found"
+    return "LinkedIn Mentioned" if "linkedin" in text.lower() else "Not Found"
 
 
 def extract_github(text):
 
     match = re.search(
-        r"(https?://)?(www\.)?github\.com/[A-Za-z0-9_/\-]+",
+        r"(https?://)?(www\.)?github\.com/[^\s|]+",
         text,
         re.IGNORECASE
     )
@@ -62,10 +54,7 @@ def extract_github(text):
     if match:
         return match.group()
 
-    if "github" in text.lower():
-        return "GitHub Mentioned"
-
-    return "Not Found"
+    return "GitHub Mentioned" if "github" in text.lower() else "Not Found"
 
 
 def extract_portfolio(text):
@@ -78,13 +67,16 @@ def extract_portfolio(text):
 
     for url in matches:
 
-        url = url.strip()
+        lower = url.lower()
 
-        if (
-            "gmail" in url.lower()
-            or "linkedin" in url.lower()
-            or "github" in url.lower()
-        ):
+        if any(x in lower for x in [
+            "gmail",
+            "linkedin",
+            "github",
+            "hotmail",
+            "yahoo",
+            "outlook"
+        ]):
             continue
 
         return url
@@ -94,39 +86,55 @@ def extract_portfolio(text):
 
 def extract_name(text):
 
-    lines = text.strip().split("\n")
+    skip_words = {
+        "resume",
+        "resume sample",
+        "functional resume sample",
+        "curriculum vitae",
+        "cv"
+    }
 
-    for line in lines:
+    lines = [line.strip() for line in text.split("\n") if line.strip()]
 
-        line = line.strip()
+    for line in lines[:10]:
 
-        if not line:
+        lower = line.lower()
+
+        if any(word in lower for word in skip_words):
             continue
 
-        line = re.sub(r"\+?\d[\d\s().-]{8,}", "", line)
+        if "@" in line:
+            continue
 
-        line = re.sub(
-            r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}",
-            "",
-            line
-        )
+        if "linkedin" in lower or "github" in lower:
+            continue
 
-        line = line.replace("|", " ")
+        if re.search(r"\d{3,}", line):
+            continue
+
+        line = re.sub(r"[^\w\s.]", " ", line)
 
         words = line.split()
 
-        name_words = []
+        if len(words) < 2 or len(words) > 5:
+            continue
+
+        valid = True
 
         for word in words:
 
-            if word.isalpha() and len(word) > 1:
+            if len(word) == 1:
+                continue
 
-                if word.upper() == word or word.istitle():
+            if "." in word:
+                continue
 
-                    name_words.append(word)
+            if not (word.istitle() or word.isupper()):
+                valid = False
+                break
 
-        if 2 <= len(name_words) <= 6:
-            return " ".join(name_words).title()
+        if valid:
+            return " ".join(words)
 
     return "Not Found"
 
