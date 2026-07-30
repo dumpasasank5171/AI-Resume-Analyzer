@@ -8,9 +8,21 @@ def load_skills():
 
     skills_df.columns = skills_df.columns.str.strip()
 
-    skills_df["Category"] = skills_df["Category"].astype(str).str.strip()
+    skills_df["Category"] = (
+        skills_df["Category"]
+        .fillna("")
+        .astype(str)
+        .str.strip()
+    )
 
-    skills_df["Skill"] = skills_df["Skill"].astype(str).str.strip()
+    skills_df["Skill"] = (
+        skills_df["Skill"]
+        .fillna("")
+        .astype(str)
+        .str.strip()
+    )
+
+    skills_df = skills_df[skills_df["Skill"] != ""]
 
     return skills_df
 
@@ -25,9 +37,12 @@ def extract_skills(text, skills_df):
 
     for _, row in skills_df.iterrows():
 
-        category = row["Category"]
+        category = str(row["Category"]).strip()
 
-        skill = row["Skill"]
+        skill = str(row["Skill"]).strip()
+
+        if not skill:
+            continue
 
         pattern = r'(?<!\w)' + re.escape(skill.lower()) + r'(?!\w)'
 
