@@ -16,13 +16,20 @@ def extract_email(text):
 
 def extract_phone(text):
 
-    match = re.search(
-        r"(\+?\d{1,3}[- ]?)?(\d{10})",
-        text
-    )
+    patterns = [
+        r"\+\d{1,3}\s?\d{10}",
+        r"\d{10}",
+        r"\(\d{3}\)\s?\d{3}-\d{4}",
+        r"\d{3}[-.\s]\d{3}[-.\s]\d{4}",
+        r"\+\d{1,3}[-\s]?\(\d{3}\)\s?\d{3}[-.\s]?\d{4}"
+    ]
 
-    if match:
-        return match.group()
+    for pattern in patterns:
+
+        match = re.search(pattern, text)
+
+        if match:
+            return match.group().strip()
 
     return "Not Found"
 
@@ -30,7 +37,7 @@ def extract_phone(text):
 def extract_linkedin(text):
 
     match = re.search(
-        r"(https?://)?(www\.)?linkedin\.com/in/[A-Za-z0-9_-]+",
+        r"(https?://)?(www\.)?linkedin\.com/[A-Za-z0-9_/\-]+",
         text,
         re.IGNORECASE
     )
@@ -47,7 +54,7 @@ def extract_linkedin(text):
 def extract_github(text):
 
     match = re.search(
-        r"(https?://)?(www\.)?github\.com/[A-Za-z0-9_-]+",
+        r"(https?://)?(www\.)?github\.com/[A-Za-z0-9_/\-]+",
         text,
         re.IGNORECASE
     )
@@ -64,19 +71,23 @@ def extract_github(text):
 def extract_portfolio(text):
 
     matches = re.findall(
-        r"(https?://[^\s]+|www\.[^\s]+)",
+        r"(https?://[^\s|]+|www\.[^\s|]+|[A-Za-z0-9.-]+\.(?:com|dev|io|me|net))",
         text,
         re.IGNORECASE
     )
 
     for url in matches:
 
+        url = url.strip()
+
         if (
-            "linkedin" not in url.lower()
-            and "github" not in url.lower()
-            and "gmail" not in url.lower()
+            "gmail" in url.lower()
+            or "linkedin" in url.lower()
+            or "github" in url.lower()
         ):
-            return url
+            continue
+
+        return url
 
     return "Not Found"
 
@@ -92,7 +103,7 @@ def extract_name(text):
         if not line:
             continue
 
-        line = re.sub(r"\+?\d[\d\s-]{8,}", "", line)
+        line = re.sub(r"\+?\d[\d\s().-]{8,}", "", line)
 
         line = re.sub(
             r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}",
@@ -100,16 +111,21 @@ def extract_name(text):
             line
         )
 
+        line = line.replace("|", " ")
+
         words = line.split()
 
         name_words = []
 
         for word in words:
 
-            if word.isalpha() and word.isupper():
-                name_words.append(word)
+            if word.isalpha() and len(word) > 1:
 
-        if len(name_words) >= 2:
+                if word.upper() == word or word.istitle():
+
+                    name_words.append(word)
+
+        if 2 <= len(name_words) <= 6:
             return " ".join(name_words).title()
 
     return "Not Found"
