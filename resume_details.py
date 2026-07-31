@@ -96,44 +96,43 @@ def extract_portfolio(text):
 
 def extract_name(text):
 
-    skip_words = {
-        "resume",
-        "resume sample",
-        "functional resume sample",
-        "curriculum vitae",
-        "cv",
-        "contact",
-        "education",
-        "skills",
-        "projects",
-        "experience",
-        "career",
-        "objective",
-        "summary",
-        "profile"
-    }
-
-    bad_words = {
-        "india", "usa", "street", "road", "avenue",
-        "university", "college", "school",
-        "city", "state", "district",
-        "pittsburgh", "visakhapatnam",
-        "hyderabad", "bangalore",
-        "mumbai", "delhi",
-        "london", "new", "york",
-        "pa", "ca", "ny"
-    }
-
     lines = [line.strip() for line in text.split("\n") if line.strip()]
+
+    job_titles = {
+        "engineer", "developer", "analyst", "manager", "scientist",
+        "student", "designer", "architect", "consultant",
+        "specialist", "administrator", "technician",
+        "programmer", "intern", "researcher", "officer",
+        "director", "executive", "coordinator"
+    }
+
+    section_words = {
+        "resume", "resume sample", "functional resume sample",
+        "curriculum vitae", "cv", "contact", "education",
+        "skills", "projects", "experience", "career",
+        "objective", "summary", "profile", "work experience",
+        "professional experience", "employment",
+        "certifications", "languages", "interests",
+        "references"
+    }
+
+    location_words = {
+        "india", "usa", "uk", "street", "road", "avenue",
+        "university", "college", "school", "city", "state",
+        "district", "pittsburgh", "visakhapatnam",
+        "hyderabad", "bangalore", "mumbai", "delhi",
+        "chicago", "malvern", "new", "york",
+        "pa", "ca", "ny", "il"
+    }
 
     candidates = []
 
-    for i, line in enumerate(lines[:20]):
+    for i, line in enumerate(lines[:15]):
 
         original = line
         lower = line.lower()
 
-        if any(word in lower for word in skip_words):
+        if any(word in lower for word in section_words):
             continue
 
         if "@" in lower:
@@ -142,17 +141,20 @@ def extract_name(text):
         if "linkedin" in lower or "github" in lower:
             continue
 
-        line = re.sub(r"\+\d.*$", "", line).strip()
-        line = re.sub(r"\d[\d\s().+-]{6,}$", "", line).strip()
+        line = re.sub(r"\+\d.*$", "", line)
+        line = re.sub(r"\d[\d\s().+-]{6,}$", "", line)
 
         line = re.sub(r"[^A-Za-z\s.'-]", " ", line)
 
         words = [w for w in line.split() if w]
 
-        if len(words) < 2 or len(words) > 5:
+        if len(words) < 2 or len(words) > 4:
             continue
 
-        if any(w.lower() in bad_words for w in words):
+        if any(w.lower() in location_words for w in words):
+            continue
+
+        if any(w.lower() in job_titles for w in words):
             continue
 
         valid = True
@@ -162,10 +164,11 @@ def extract_name(text):
             if len(word) == 1:
                 continue
 
-            if word.endswith("."):
-                continue
-
-            if not (word.istitle() or word.isupper()):
+            if not (
+                word.istitle()
+                or word.isupper()
+                or "." in word
+            ):
                 valid = False
                 break
 
@@ -174,16 +177,16 @@ def extract_name(text):
 
         score = 0
 
-        # Higher priority for lines near the top
-        score += max(0, 20 - i)
+        score += max(0, 50 - i * 4)
 
-        # Prefer ALL CAPS names
         if original.isupper():
             score += 40
 
-        # Prefer 2-4 word names
-        if 2 <= len(words) <= 4:
-            score += 15
+        if 2 <= len(words) <= 3:
+            score += 20
+
+        if len(words) == 2:
+            score += 10
 
         candidates.append((score, " ".join(words)))
 
@@ -192,8 +195,7 @@ def extract_name(text):
         return candidates[0][1]
 
     return "Not Found"
-
-
+    
 def extract_details(text):
 
     return {
