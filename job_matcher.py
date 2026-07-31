@@ -33,11 +33,11 @@ def match_jobs(found_skills, jobs_df):
 
         matched = 0
 
-        found = [s.lower() for s in found_skills]
+        found = [skill.lower() for skill in found_skills]
 
-            for skill in required_skills:
-                if skill.lower() in found:
-                    matched += 1
+        for skill in required_skills:
+            if skill.lower() in found:
+                matched += 1
 
         skill_score = matched / len(required_skills)
 
@@ -52,14 +52,3 @@ def match_jobs(found_skills, jobs_df):
         final_score = (0.7 * skill_score) + (0.3 * tfidf_score)
 
         scores.append(round(final_score * 100, 2))
-
-    result = jobs_df.copy()
-
-    result["Score"] = scores
-
-    result = result.sort_values(
-        by="Score",
-        ascending=False
-    ).reset_index(drop=True)
-
-    return result
