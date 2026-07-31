@@ -61,7 +61,6 @@ def extract_github(text):
 
 def extract_portfolio(text):
 
-    # Remove all email addresses first
     text = re.sub(
         r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}",
         " ",
@@ -99,29 +98,48 @@ def extract_name(text):
     lines = [line.strip() for line in text.split("\n") if line.strip()]
 
     job_titles = {
-        "engineer", "developer", "analyst", "manager", "scientist",
-        "student", "designer", "architect", "consultant",
-        "specialist", "administrator", "technician",
-        "programmer", "intern", "researcher", "officer",
-        "director", "executive", "coordinator"
+        "engineer", "developer", "analyst", "manager",
+        "scientist", "student", "designer", "architect",
+        "consultant", "specialist", "administrator",
+        "technician", "programmer", "intern",
+        "researcher", "officer", "director",
+        "executive", "coordinator"
     }
 
     section_words = {
-        "resume", "resume sample", "functional resume sample",
-        "curriculum vitae", "cv", "contact", "education",
-        "skills", "projects", "experience", "career",
-        "objective", "summary", "profile", "work experience",
-        "professional experience", "employment",
-        "certifications", "languages", "interests",
+        "resume",
+        "resume sample",
+        "functional resume sample",
+        "curriculum vitae",
+        "cv",
+        "contact",
+        "education",
+        "skills",
+        "projects",
+        "experience",
+        "career",
+        "objective",
+        "summary",
+        "profile",
+        "work experience",
+        "professional experience",
+        "employment",
+        "certifications",
+        "languages",
+        "interests",
         "references"
     }
 
     location_words = {
-        "india", "usa", "uk", "street", "road", "avenue",
-        "university", "college", "school", "city", "state",
-        "district", "pittsburgh", "visakhapatnam",
-        "hyderabad", "bangalore", "mumbai", "delhi",
-        "chicago", "malvern", "new", "york",
+        "india", "usa", "uk",
+        "street", "road", "avenue",
+        "university", "college", "school",
+        "city", "state", "district",
+        "pittsburgh", "visakhapatnam",
+        "hyderabad", "bangalore",
+        "mumbai", "delhi",
+        "chicago", "malvern",
+        "new", "york",
         "pa", "ca", "ny", "il"
     }
 
@@ -143,7 +161,6 @@ def extract_name(text):
 
         line = re.sub(r"\+\d.*$", "", line)
         line = re.sub(r"\d[\d\s().+-]{6,}$", "", line)
-
         line = re.sub(r"[^A-Za-z\s.'-]", " ", line)
 
         words = [w for w in line.split() if w]
@@ -190,26 +207,29 @@ def extract_name(text):
 
         candidates.append((score, " ".join(words)))
 
-        if candidates:
-            candidates.sort(reverse=True)
-            return candidates[0][1]
+    if candidates:
+        candidates.sort(reverse=True)
+        return candidates[0][1]
 
-    
-        for line in lines[:5]:
+    # Fallback for single-word names
+    for line in lines[:5]:
 
-            clean = re.sub(r"[^A-Za-z]", "", line)
+        clean = re.sub(r"[^A-Za-z]", "", line)
+        lower = clean.lower()
 
-            if (
-               clean.isalpha()
-               and len(clean) >= 3
-               and clean.lower() not in section_words
-               and clean.lower() not in job_titles
-               and clean.lower() not in location_words
-            ):
-               return clean
+        if (
+            clean.isalpha()
+            and len(clean) >= 3
+            and lower not in section_words
+            and lower not in job_titles
+            and lower not in location_words
+            and not clean.isupper()
+        ):
+            return clean
 
-         return "Not Found"
-    
+    return "Not Found"
+
+
 def extract_details(text):
 
     return {
