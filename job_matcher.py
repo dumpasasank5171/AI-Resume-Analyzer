@@ -33,10 +33,11 @@ def match_jobs(found_skills, jobs_df):
 
         matched = 0
 
-        for skill in required_skills:
+        found = [s.lower() for s in found_skills]
 
-            if skill in found_skills:
-                matched += 1
+            for skill in required_skills:
+                if skill.lower() in found:
+                    matched += 1
 
         skill_score = matched / len(required_skills)
 
