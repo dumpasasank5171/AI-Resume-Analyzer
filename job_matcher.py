@@ -19,7 +19,7 @@ def load_jobs():
 
 def match_jobs(found_skills, jobs_df):
 
-    resume_text = " ".join(found_skills).lower()
+    resume_text = " ".join(skill.lower() for skill in found_skills)
 
     scores = []
 
