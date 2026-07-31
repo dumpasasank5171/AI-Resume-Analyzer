@@ -57,7 +57,6 @@ def extract_portfolio(text):
 def extract_name(text):
     lines = [line.strip() for line in text.split("\n") if line.strip()]
     
-    # Dictionaries moved to the top to prevent NameError
     section_words = {
         "experience", "education", "skills", "projects", "certifications", 
         "languages", "interests", "references", "objective", "summary", 
@@ -72,8 +71,6 @@ def extract_name(text):
         "designer", "student", "consultant", "architect", "researcher", 
         "specialist", "administrator", "technician"
     }
-    
-    # 1. Added lowercase state abbreviations to location_words
     location_words = {
         "india", "usa", "uk", "canada", "australia", "singapore", "california", 
         "texas", "new", "york", "chicago", "mumbai", "delhi", "bangalore", 
@@ -83,8 +80,8 @@ def extract_name(text):
         "pa", "ca", "ny", "tx", "wa", "fl", "il", "oh", "mi", "nj"
     }
 
-    # 3. Refined multi-line uppercase rule with dictionary validation
-    for i in range(min(3, len(lines) - 1)):
+    # 3. Refined multi-line uppercase rule with full location/job filtering
+    for i in range(min(10, len(lines) - 1)):
         first = re.sub(r"[^A-Za-z]", "", lines[i])
         second = re.sub(r"[^A-Za-z]", "", lines[i+1])
         if (
@@ -93,16 +90,17 @@ def extract_name(text):
             first.lower() not in section_words and
             second.lower() not in section_words and
             first.lower() not in job_words and
-            second.lower() not in job_words
+            second.lower() not in job_words and
+            first.lower() not in location_words and
+            second.lower() not in location_words
         ):
             return first + " " + second
 
-    for line in lines[:8]:
+    # Scan the top 20 lines to account for skewed extraction bounds
+    for line in lines[:20]:
         lower = line.lower()
         
-        # 2. Relaxed comma rule: only skips short lines (likely addresses/cities)
-        if "," in line and len(line.split()) <= 3:
-            continue
+        # (Hardcoded title phrases and aggressive comma filters have been removed)
             
         if any(word in lower for word in section_words):
             continue
@@ -120,18 +118,25 @@ def extract_name(text):
         if len(words) == 0:
             continue
             
-        # City/State filtering fallback
         if len(words) == 2:
             if words[1].upper() in {"PA", "CA", "NY", "TX", "WA", "FL", "IL", "OH", "MI", "NJ"}:
                 continue
 
         if any(word.lower() in job_words for word in words):
             continue
-        if any(word.lower() in location_words for word in words):
+            
+        location_count = sum(word.lower() in location_words for word in words)
+        if location_count == len(words):
             continue
 
-        # Single word skip fallback
         if len(words) == 1:
+            if (
+                words[0].isupper()
+                and words[0].lower() not in section_words
+                and words[0].lower() not in job_words
+                and words[0].lower() not in location_words
+            ):
+                return words[0]
             continue
 
         if 2 <= len(words) <= 4:
