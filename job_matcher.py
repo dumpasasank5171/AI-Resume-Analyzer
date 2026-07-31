@@ -41,7 +41,7 @@ def match_jobs(found_skills, jobs_df):
 
         skill_score = matched / len(required_skills)
 
-        job_text = " ".join(required_skills).lower()
+        job_text = " ".join(skill.lower() for skill in required_skills)
 
         vectorizer = TfidfVectorizer()
 
@@ -52,3 +52,14 @@ def match_jobs(found_skills, jobs_df):
         final_score = (0.7 * skill_score) + (0.3 * tfidf_score)
 
         scores.append(round(final_score * 100, 2))
+
+    result = jobs_df.copy()
+
+    result["Score"] = scores
+
+    result = result.sort_values(
+        by="Score",
+        ascending=False
+    ).reset_index(drop=True)
+
+    return result
