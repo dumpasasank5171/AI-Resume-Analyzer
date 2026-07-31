@@ -1,28 +1,32 @@
 # 📄 AI Resume Analyzer
 
-A Python-based AI Resume Analyzer that extracts skills from a resume, recommends suitable job roles, identifies missing skills, and generates a personalized learning roadmap using TF-IDF and Cosine Similarity.
+An AI-powered Resume Analyzer built using **Python** and **Streamlit** that extracts resume information, identifies technical skills, matches resumes with suitable job roles, calculates a resume score, provides improvement suggestions, and generates a personalized learning roadmap.
 
 ---
 
 ## 🌐 Live Demo
 
-🔗 https://ai-resume-analyzer-kxnbb8tjak94cncmpunj9n.streamlit.app/
+https://ai-resume-analyzer-pz8yjksmhdhoyxj6hfnyrl.streamlit.app
 
 ---
 
 ## 📌 Overview
 
-AI Resume Analyzer is a web application built with **Python**, **Streamlit**, **Pandas**, and **Scikit-learn**. Users can upload their resume in PDF format, and the application automatically:
+AI Resume Analyzer is a web application developed using **Python**, **Streamlit**, **Pandas**, and **Scikit-learn**. The application allows users to upload their resume in PDF format and automatically analyzes it to provide valuable insights.
 
-- Extracts resume text
-- Cleans and processes the text
+The system performs the following tasks:
+
+- Extracts resume text from PDF
+- Cleans and processes the extracted text
+- Extracts personal details
 - Identifies technical skills
-- Matches the resume with suitable job roles
-- Displays the top 3 job recommendations
-- Shows missing skills
+- Detects resume sections
+- Matches the resume with predefined job roles
+- Calculates a resume score
+- Suggests resume improvements
 - Generates a personalized learning roadmap
 
-The project uses **TF-IDF Vectorization** and **Cosine Similarity** to recommend the most relevant job roles.
+The application uses **TF-IDF Vectorization** and **Cosine Similarity** to compare resumes with predefined job roles and recommend the best matches.
 
 ---
 
@@ -31,9 +35,13 @@ The project uses **TF-IDF Vectorization** and **Cosine Similarity** to recommend
 - 📄 Upload PDF Resume
 - 📝 Resume Text Extraction
 - 🧹 Resume Text Cleaning
+- 👤 Personal Details Extraction
 - 💡 Automatic Skill Extraction
-- 🎯 Top 3 Job Recommendations
-- 📊 Match Percentage
+- 📂 Resume Section Detection
+- 🎯 Top Job Role Recommendations
+- 📊 Resume Match Percentage
+- ⭐ Resume Score Calculation
+- ✅ Resume Improvement Suggestions
 - ❌ Missing Skill Identification
 - 📚 Personalized Learning Roadmap
 - 🌐 Interactive Streamlit Web Interface
@@ -44,13 +52,19 @@ The project uses **TF-IDF Vectorization** and **Cosine Similarity** to recommend
 
 ## Home Page
 
-![Home Page](images/home.png)
+![Home Page](images/Home.png)
+
+---
+
+## Resume Analysis
+
+![Resume Analysis](images/resume_details.png)
 
 ---
 
 ## Job Recommendations
 
-![Job Recommendations](images/recommendation.png)
+![Job Recommendations](images/top_recommended_jobs.png)
 
 ---
 
@@ -65,9 +79,10 @@ The project uses **TF-IDF Vectorization** and **Cosine Similarity** to recommend
 - Python
 - Streamlit
 - Pandas
+- NumPy
 - Scikit-learn
-- PyPDF
-- Python-docx
+- PyMuPDF (fitz)
+- Regular Expressions (re)
 
 ---
 
@@ -79,8 +94,12 @@ AI-Resume-Analyzer/
 │── app.py
 │── resume_parser.py
 │── text_cleaner.py
+│── resume_details.py
 │── skill_extractor.py
+│── section_detector.py
 │── job_matcher.py
+│── resume_score.py
+│── resume_suggestions.py
 │── roadmap_generator.py
 │── requirements.txt
 │── README.md
@@ -92,141 +111,64 @@ AI-Resume-Analyzer/
 │
 ├── images/
 │   ├── home.png
-│   ├── recommendation.png
+│   ├── resume_analysis.png
+│   ├── job_recommendation.png
 │   └── roadmap.png
 │
 └── sample_resumes/
-    ├── Python_Developer_Resume.pdf
-    └── Data_Analyst_Resume.pdf
 ```
 
 ---
 
-# ⚙️ Installation
+# ⚙️ How It Works
 
-Clone the repository.
-
-```bash
-git clone https://github.com/dumpasasank5171/AI-Resume-Analyzer.git
-```
-
-Move into the project folder.
-
-```bash
-cd AI-Resume-Analyzer
-```
-
-Install the required libraries.
-
-```bash
-pip install -r requirements.txt
-```
-
-Run the application.
-
-```bash
-streamlit run app.py
-```
+1. Upload a resume in PDF format.
+2. Extract text from the uploaded resume.
+3. Clean and preprocess the extracted text.
+4. Extract personal details such as Name, Email, Phone Number, LinkedIn, GitHub, and Portfolio.
+5. Identify technical skills using the skill dictionary.
+6. Detect important resume sections.
+7. Compare the resume with predefined job roles using TF-IDF and Cosine Similarity.
+8. Display the top matching job roles with similarity scores.
+9. Calculate a resume score.
+10. Suggest improvements and identify missing skills.
+11. Generate a personalized learning roadmap.
 
 ---
 
-# 📖 How to Use
+# 📊 Datasets
 
-1. Launch the application.
-2. Upload a PDF resume.
-3. Wait for the resume to be processed.
-4. View the extracted resume text.
-5. Review the detected skills.
-6. Explore the top 3 recommended job roles.
-7. Check missing skills.
-8. Follow the generated learning roadmap.
+The application uses two CSV files:
 
----
+### `skill_dictionary.csv`
 
-# 🔄 Workflow
+Contains a list of technical skills used for skill extraction.
 
-```text
-Upload Resume
-       │
-       ▼
-Extract Resume Text
-       │
-       ▼
-Clean Resume Text
-       │
-       ▼
-Extract Skills
-       │
-       ▼
-TF-IDF Vectorization
-       │
-       ▼
-Cosine Similarity
-       │
-       ▼
-Top Job Recommendations
-       │
-       ▼
-Missing Skills
-       │
-       ▼
-Learning Roadmap
-```
+### `job_roles.csv`
+
+Contains predefined job roles and their required skills for job matching.
 
 ---
 
-# 📊 Modules
+# 🔮 Future Enhancements
 
-### Resume Parser
-
-Extracts text from uploaded PDF resumes.
-
----
-
-### Text Cleaner
-
-Removes unnecessary characters and converts text into a clean format suitable for analysis.
-
----
-
-### Skill Extractor
-
-Identifies technical skills using a predefined skill dictionary.
-
----
-
-### Job Matcher
-
-Uses TF-IDF Vectorization and Cosine Similarity to compare resume skills with job role requirements.
-
----
-
-### Roadmap Generator
-
-Suggests learning resources for missing skills required for the recommended job role.
-
----
-
-# 🎯 Future Improvements
-
-- Resume score prediction
+- Support DOCX resumes
+- AI-based resume summarization
 - ATS compatibility analysis
-- Resume improvement suggestions
-- Support for DOCX resumes
-- AI-generated career advice
-- Integration with job portals
-- Resume keyword optimization
+- Resume ranking for recruiters
+- Support for resumes from multiple domains
+- Integration with online job portals
 
 ---
 
 # 👨‍💻 Author
 
-**Dumpa Sasank**
+**Your Name**
 
-B.Tech – Computer Science
+B.Tech – Computer Science and Engineering
 
 ---
 
-# 📜 License
+# 📄 License
 
 This project is developed for educational and academic purposes.
