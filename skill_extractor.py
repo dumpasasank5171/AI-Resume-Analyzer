@@ -58,10 +58,28 @@ def extract_skills(text, skills_df):
 
                 categorized_skills[category].append(skill)
 
-    found_skills.sort()
+    # Automatically infer Git if GitHub is present
+    if "GitHub" in found_skills and "Git" not in found_skills:
+
+        found_skills.append("Git")
+
+        git_category = ""
+
+        for _, row in skills_df.iterrows():
+            if str(row["Skill"]).strip().lower() == "git":
+                git_category = str(row["Category"]).strip()
+                break
+
+        if git_category:
+
+            if git_category not in categorized_skills:
+                categorized_skills[git_category] = []
+
+            categorized_skills[git_category].append("Git")
+
+    found_skills = sorted(set(found_skills))
 
     for category in categorized_skills:
-
-        categorized_skills[category].sort()
+        categorized_skills[category] = sorted(set(categorized_skills[category]))
 
     return found_skills, categorized_skills
