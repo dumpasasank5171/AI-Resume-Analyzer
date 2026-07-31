@@ -46,3 +46,12 @@ Big Data Engineer,"Hadoop, Apache Spark, Hive, Kafka, Python"
 Data Engineer,"Python, SQL, Apache Spark, ETL, Airflow"
 MLOps Engineer,"Python, Docker, Kubernetes, AWS, Git, CI/CD"
 Research Engineer,"Python, Machine Learning, Deep Learning, PyTorch, TensorFlow"
+Computer Engineer,"C,C++,MATLAB,VHDL,FPGA,Xilinx Vivado,Git,Embedded Systems,Computer Organization"
+
+FPGA Engineer,"FPGA,VHDL,Xilinx Vivado,MATLAB,Signal Processing,Git"
+
+Firmware Engineer,"Embedded C,C++,Firmware Development,Microcontrollers,Git"
+
+Hardware Engineer,"VHDL,FPGA,MATLAB,Signal Processing,Computer Organization"
+
+Systems Engineer,"VMware,Linux,Networking,Git,Infrastructure"
