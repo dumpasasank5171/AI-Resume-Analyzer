@@ -6,13 +6,17 @@ def calculate_resume_score(skills, details, text):
 
     skill_count = len(skills)
 
-    if skill_count >= 15:
+    if skill_count >= 20:
         skill_score = 40
+    elif skill_count >= 15:
+        skill_score = 35
     elif skill_count >= 10:
         skill_score = 30
+    elif skill_count >= 7:
+        skill_score = 25
     elif skill_count >= 5:
         skill_score = 20
-    elif skill_count >= 1:
+    elif skill_count >= 3:
         skill_score = 10
     else:
         skill_score = 0
@@ -50,10 +54,17 @@ def calculate_resume_score(skills, details, text):
 
     experience_keywords = [
         "experience",
+        "work experience",
+        "professional experience",
+        "employment",
+        "employment history",
+        "work history",
         "internship",
         "intern",
-        "worked",
-        "employment"
+        "engineer",
+        "developer",
+        "analyst",
+        "manager"
     ]
 
     experience_score = 15 if any(word in text_lower for word in experience_keywords) else 0
