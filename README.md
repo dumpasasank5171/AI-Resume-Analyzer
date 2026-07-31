@@ -163,7 +163,7 @@ Contains predefined job roles and their required skills for job matching.
 
 # 👨‍💻 Author
 
-**Your Name**
+**Dumpa Sasank**
 
 B.Tech – Computer Science and Engineering
 
