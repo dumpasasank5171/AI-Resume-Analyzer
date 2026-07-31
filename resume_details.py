@@ -60,7 +60,9 @@ def extract_name(text):
     section_words = {
         "experience", "education", "skills", "projects", "certifications", 
         "languages", "interests", "references", "objective", "summary", 
-        "profile", "contact", "career", "resume", "employment", "achievements"
+        "profile", "contact", "career", "resume", "employment", "achievements",
+        "professional", "work", "history", "overview", "about", "coursework", 
+        "courses", "awards", "gpa", "mentor", "captain"
     }
     contact_words = {
         "phone", "mobile", "email", "linkedin", "github", "portfolio", 
@@ -77,35 +79,40 @@ def extract_name(text):
         "hyderabad", "pune", "seattle", "san", "francisco", "london", "boston", 
         "austin", "toronto", "vancouver", "sydney", "melbourne", "germany", 
         "france", "tokyo", "dubai", "atlanta", "dallas", "denver", "miami",
-        "pa", "ca", "ny", "tx", "wa", "fl", "il", "oh", "mi", "nj"
+        "pa", "ca", "ny", "tx", "wa", "fl", "il", "oh", "mi", "nj",
+        "university", "college", "institute", "school"
     }
 
-    # 3. Refined multi-line uppercase rule with full location/job filtering
+    # Highly precise granular multi-line block token validation loop
     for i in range(min(10, len(lines) - 1)):
-        first = re.sub(r"[^A-Za-z]", "", lines[i])
-        second = re.sub(r"[^A-Za-z]", "", lines[i+1])
+        first = re.sub(r"[^A-Za-z\s]", "", lines[i]).strip()
+        second = re.sub(r"[^A-Za-z\s]", "", lines[i+1]).strip()
         if (
-            first.isalpha() and second.isalpha() and 
-            first.isupper() and second.isupper() and
-            first.lower() not in section_words and
-            second.lower() not in section_words and
-            first.lower() not in job_words and
-            second.lower() not in job_words and
-            first.lower() not in location_words and
-            second.lower() not in location_words
+            first.replace(" ", "").isalpha() and 
+            second.replace(" ", "").isalpha() and 
+            first.upper() == first and 
+            second.upper() == second and
+            not any(w.lower() in section_words for w in first.split()) and
+            not any(w.lower() in section_words for w in second.split()) and
+            not any(w.lower() in job_words for w in first.split()) and
+            not any(w.lower() in job_words for w in second.split()) and
+            not any(w.lower() in location_words for w in first.split()) and
+            not any(w.lower() in location_words for w in second.split())
         ):
             return first + " " + second
 
-    # Scan the top 20 lines to account for skewed extraction bounds
-    for line in lines[:20]:
+    # Core contextual perimeter scanning sweep
+    for line in lines[:30]:
         lower = line.lower()
         
-        # (Hardcoded title phrases and aggressive comma filters have been removed)
+        # Word-based complete dictionary token matching via set intersection
+        line_words = set(re.findall(r"[a-zA-Z]+", lower))
+        
+        if line_words & section_words:
+            continue
+        if line_words & contact_words:
+            continue
             
-        if any(word in lower for word in section_words):
-            continue
-        if any(word in lower for word in contact_words):
-            continue
         if "@" in line:
             continue
         if "http" in lower or "www" in lower:
@@ -116,6 +123,10 @@ def extract_name(text):
         clean = re.sub(r"[^A-Za-z\s.'-]", "", line).strip()
         words = clean.split()
         if len(words) == 0:
+            continue
+            
+        degree = clean.upper().replace(".", "")
+        if degree in {"BS", "MS", "BTECH", "MTECH", "BE", "ME", "BSC", "MSC", "BCA", "MCA", "PHD"}:
             continue
             
         if len(words) == 2:
@@ -140,6 +151,13 @@ def extract_name(text):
             continue
 
         if 2 <= len(words) <= 4:
+            bad = {
+                "bs", "ms", "btech", "mtech", "be", "me", "bsc", "msc", 
+                "bca", "mca", "phd"
+            }
+            if any(word.lower().replace(".", "") in bad for word in words):
+                continue
+                
             valid = True
             for word in words:
                 if len(word) == 1:
