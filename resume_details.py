@@ -42,10 +42,7 @@ def extract_linkedin(text):
     if match:
         return match.group()
 
-    if "linkedin" in text.lower():
-        return "LinkedIn Mentioned"
-
-    return "Not Found"
+    return "LinkedIn Mentioned" if "linkedin" in text.lower() else "Not Found"
 
 
 def extract_github(text):
@@ -59,10 +56,7 @@ def extract_github(text):
     if match:
         return match.group()
 
-    if "github" in text.lower():
-        return "GitHub Mentioned"
-
-    return "Not Found"
+    return "GitHub Mentioned" if "github" in text.lower() else "Not Found"
 
 
 def extract_portfolio(text):
@@ -99,34 +93,58 @@ def extract_name(text):
         "resume sample",
         "functional resume sample",
         "curriculum vitae",
-        "cv"
+        "cv",
+        "contact",
+        "education",
+        "skills",
+        "projects",
+        "experience",
+        "career",
+        "objective",
+        "summary",
+        "profile"
+    }
+
+    bad_words = {
+        "india", "usa", "street", "road", "avenue",
+        "university", "college", "school",
+        "city", "state", "district",
+        "pittsburgh", "visakhapatnam",
+        "hyderabad", "bangalore",
+        "mumbai", "delhi",
+        "london", "new", "york",
+        "pa", "ca", "ny"
     }
 
     lines = [line.strip() for line in text.split("\n") if line.strip()]
 
-    for line in lines[:10]:
+    candidates = []
 
+    for i, line in enumerate(lines[:20]):
+
+        original = line
         lower = line.lower()
 
         if any(word in lower for word in skip_words):
             continue
 
-        if "@" in line:
+        if "@" in lower:
             continue
 
         if "linkedin" in lower or "github" in lower:
             continue
 
-        # Remove phone number if present
         line = re.sub(r"\+\d.*$", "", line).strip()
         line = re.sub(r"\d[\d\s().+-]{6,}$", "", line).strip()
 
-        # Keep only letters, spaces, apostrophe, dot and hyphen
         line = re.sub(r"[^A-Za-z\s.'-]", " ", line)
 
         words = [w for w in line.split() if w]
 
         if len(words) < 2 or len(words) > 5:
+            continue
+
+        if any(w.lower() in bad_words for w in words):
             continue
 
         valid = True
@@ -143,8 +161,27 @@ def extract_name(text):
                 valid = False
                 break
 
-        if valid:
-            return " ".join(words)
+        if not valid:
+            continue
+
+        score = 0
+
+        # Higher priority for lines near the top
+        score += max(0, 20 - i)
+
+        # Prefer ALL CAPS names
+        if original.isupper():
+            score += 40
+
+        # Prefer 2-4 word names
+        if 2 <= len(words) <= 4:
+            score += 15
+
+        candidates.append((score, " ".join(words)))
+
+    if candidates:
+        candidates.sort(reverse=True)
+        return candidates[0][1]
 
     return "Not Found"
 
