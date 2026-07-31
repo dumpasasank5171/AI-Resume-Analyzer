@@ -190,11 +190,25 @@ def extract_name(text):
 
         candidates.append((score, " ".join(words)))
 
-    if candidates:
-        candidates.sort(reverse=True)
-        return candidates[0][1]
+        if candidates:
+            candidates.sort(reverse=True)
+            return candidates[0][1]
 
-    return "Not Found"
+    
+        for line in lines[:5]:
+
+            clean = re.sub(r"[^A-Za-z]", "", line)
+
+            if (
+               clean.isalpha()
+               and len(clean) >= 3
+               and clean.lower() not in section_words
+               and clean.lower() not in job_titles
+               and clean.lower() not in location_words
+            ):
+               return clean
+
+         return "Not Found"
     
 def extract_details(text):
 
