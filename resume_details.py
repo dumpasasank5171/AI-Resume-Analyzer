@@ -95,141 +95,70 @@ def extract_portfolio(text):
 
 def extract_name(text):
 
-    lines = [line.strip() for line in text.split("\n") if line.strip()]
+    lines=[line.strip() for line in text.split("\n") if line.strip()]
 
-    job_titles = {
-        "engineer", "developer", "analyst", "manager",
-        "scientist", "student", "designer", "architect",
-        "consultant", "specialist", "administrator",
-        "technician", "programmer", "intern",
-        "researcher", "officer", "director",
-        "executive", "coordinator"
-    }
+    section_words={"experience","education","skills","projects","certifications","languages","interests","references","objective","summary","profile","contact","career","resume","employment","achievements"}
 
-    section_words = {
-        "resume",
-        "resume sample",
-        "functional resume sample",
-        "curriculum vitae",
-        "cv",
-        "contact",
-        "education",
-        "skills",
-        "projects",
-        "experience",
-        "career",
-        "objective",
-        "summary",
-        "profile",
-        "work experience",
-        "professional experience",
-        "employment",
-        "certifications",
-        "languages",
-        "interests",
-        "references"
-    }
+    contact_words={"phone","mobile","email","linkedin","github","portfolio","website","address","city","country"}
 
-    location_words = {
-        "india", "usa", "uk",
-        "street", "road", "avenue",
-        "university", "college", "school",
-        "city", "state", "district",
-        "pittsburgh", "visakhapatnam",
-        "hyderabad", "bangalore",
-        "mumbai", "delhi",
-        "chicago", "malvern",
-        "new", "york",
-        "pa", "ca", "ny", "il"
-    }
+    job_words={"engineer","developer","intern","analyst","scientist","manager","designer","student","consultant","architect","researcher","specialist","administrator","technician"}
 
-    candidates = []
+    location_words={"india","usa","uk","canada","australia","singapore","california","texas","new","york","chicago","mumbai","delhi","bangalore","hyderabad","pune","seattle","san","francisco"}
 
-    for i, line in enumerate(lines[:15]):
+    for line in lines[:8]:
 
-        original = line
-        lower = line.lower()
+        lower=line.lower()
 
         if any(word in lower for word in section_words):
             continue
 
-        if "@" in lower:
+        if any(word in lower for word in contact_words):
             continue
 
-        if "linkedin" in lower or "github" in lower:
+        if "@" in line:
             continue
 
-        line = re.sub(r"\+\d.*$", "", line)
-        line = re.sub(r"\d[\d\s().+-]{6,}$", "", line)
-        line = re.sub(r"[^A-Za-z\s.'-]", " ", line)
-
-        words = [w for w in line.split() if w]
-
-        if len(words) < 2 or len(words) > 4:
+        if "http" in lower or "www" in lower:
             continue
 
-        if any(w.lower() in location_words for w in words):
+        if re.search(r"\d",line):
             continue
 
-        if any(w.lower() in job_titles for w in words):
+        clean=re.sub(r"[^A-Za-z\s.'-]","",line).strip()
+
+        words=clean.split()
+
+        if len(words)==0:
             continue
 
-        valid = True
-
-        for word in words:
-
-            if len(word) == 1:
-                continue
-
-            if not (
-                word.istitle()
-                or word.isupper()
-                or "." in word
-            ):
-                valid = False
-                break
-
-        if not valid:
+        if any(word.lower() in job_words for word in words):
             continue
 
-        score = 0
+        if any(word.lower() in location_words for word in words):
+            continue
 
-        score += max(0, 50 - i * 4)
+        if len(words)==1:
+            if words[0][0].isupper():
+                return words[0]
 
-        if original.isupper():
-            score += 40
+        if 2<=len(words)<=4:
 
-        if 2 <= len(words) <= 3:
-            score += 20
+            valid=True
 
-        if len(words) == 2:
-            score += 10
+            for word in words:
 
-        candidates.append((score, " ".join(words)))
+                if len(word)==1:
+                    continue
 
-    if candidates:
-        candidates.sort(reverse=True)
-        return candidates[0][1]
+                if not(word[0].isupper() or word.isupper()):
+                    valid=False
+                    break
 
-    # Fallback for single-word names
-    for line in lines[:5]:
-
-        clean = re.sub(r"[^A-Za-z]", "", line)
-        lower = clean.lower()
-
-        if (
-            clean.isalpha()
-            and len(clean) >= 3
-            and lower not in section_words
-            and lower not in job_titles
-            and lower not in location_words
-            and not clean.isupper()
-        ):
-            return clean
+            if valid:
+                return " ".join(words)
 
     return "Not Found"
-
-
+    
 def extract_details(text):
 
     return {
