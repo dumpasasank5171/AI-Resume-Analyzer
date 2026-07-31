@@ -61,8 +61,15 @@ def extract_github(text):
 
 def extract_portfolio(text):
 
+    # Remove all email addresses first
+    text = re.sub(
+        r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}",
+        " ",
+        text
+    )
+
     matches = re.findall(
-        r"(https?://[^\s|]+|www\.[^\s|]+|[A-Za-z0-9.-]+\.(?:com|dev|io|me|net))",
+        r"(https?://[^\s|]+|www\.[^\s|]+|\b[a-zA-Z0-9-]+\.(?:dev|io|me|tech|app|site)\b)",
         text,
         re.IGNORECASE
     )
@@ -72,12 +79,13 @@ def extract_portfolio(text):
         lower = url.lower()
 
         if any(site in lower for site in [
-            "gmail",
             "linkedin",
             "github",
+            "gmail",
             "hotmail",
             "yahoo",
-            "outlook"
+            "outlook",
+            "email"
         ]):
             continue
 
