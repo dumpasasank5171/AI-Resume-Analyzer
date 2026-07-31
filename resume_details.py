@@ -97,6 +97,19 @@ def extract_name(text):
 
     lines=[line.strip() for line in text.split("\n") if line.strip()]
 
+    if len(lines)>=2:
+
+        first=re.sub(r"[^A-Za-z]","",lines[0])
+        second=re.sub(r"[^A-Za-z]","",lines[1])
+
+        if(
+            first.isalpha()
+            and second.isalpha()
+            and first.isupper()
+            and second.isupper()
+        ):
+            return first+" "+second
+
     section_words={"experience","education","skills","projects","certifications","languages","interests","references","objective","summary","profile","contact","career","resume","employment","achievements"}
 
     contact_words={"phone","mobile","email","linkedin","github","portfolio","website","address","city","country"}
@@ -158,7 +171,8 @@ def extract_name(text):
                 return " ".join(words)
 
     return "Not Found"
-    
+
+
 def extract_details(text):
 
     return {
