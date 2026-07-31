@@ -62,18 +62,45 @@ def generate_suggestions(details, text, skills, missing_skills):
     if not any(word in text_lower for word in certification_keywords):
         suggestions.append("Add relevant certifications.")
 
+    # Improved achievement detection
     achievement_keywords = [
         "achievement",
         "achievements",
         "award",
-        "awards"
+        "awards",
+        "won",
+        "winner",
+        "published",
+        "patent",
+        "recognition",
+        "honor",
+        "honours",
+        "dean's list",
+        "scholarship",
+        "gpa",
+        "increased",
+        "improved",
+        "reduced",
+        "boosted",
+        "optimized",
+        "saved",
+        "grew",
+        "achieved",
+        "raised",
+        "%",
+        "million",
+        "thousand",
+        "k ",
+        "$"
     ]
 
     if not any(word in text_lower for word in achievement_keywords):
         suggestions.append("Mention your achievements or awards.")
 
     if len(skills) < 10:
-        suggestions.append("Include more technical skills relevant to your target role.")
+        suggestions.append(
+            "Include more technical skills relevant to your target role."
+        )
 
     if len(missing_skills) > 0:
         suggestions.append(
