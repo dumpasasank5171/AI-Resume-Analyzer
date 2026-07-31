@@ -77,7 +77,8 @@ def detect_sections(text):
             "work history",
             "internship",
             "internships",
-            "volunteer experience","career history",
+            "volunteer experience",
+            "career history",
             "professional background"
         ],
 
